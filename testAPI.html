@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API</title>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="m-3 p-3 shadow bg-light">
+        <!-- this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.fecha_nacimiento = fecha_nacimiento;
+        this.altura = altura; -->
+        <h3>//Manipulador de peticiones</h3>
+        <br />
+        Id Persona: <input type="text" id="id_persona" class="form-control"><br />
+        Nombre Persona: <input type="text" id="nombre_persona" class="form-control"><br />
+        Apellido Persona: <input type="text" id="apellido_persona" class="form-control"><br />
+        Fecha Nacimiento Persona: <input type="date" id="fecha_persona" class="form-control"><br />
+        Altura Persona: <input type="number" min="0.2" max="3" id="altura_persona" class="form-control"><br />
+        <br />
+        <select id="metodoseleccionado">
+            <option value="GET" selected>Peticion GET</option>
+            <option value="GETALL">Peticion GETALL</option>
+            <option value="POST">Peticion POST</option>
+            <option value="DELETE">Peticion DELETE</option>
+            <option value="PUT">Peticion PUT</option>
+            <option value="PATCH">Peticion PATCH</option>
+        </select>
+        <button class="btn btn-outline-success" onclick="ejecutarPeticion()">Realizar Petición</button>
+    </div>
+    <br />
+    <h3>Respuesta de Servidor:</h3>
+    <div id="respuesta" class="m-3 p-3 border border-5 shadow bg-light">
+    </div>
+    <script>
+        function ejecutarPeticion() {
+            let url = "http://localhost:8080/";
+            document.getElementById("respuesta").innerHTML = "";
+            let requestType = document.getElementById("metodoseleccionado").value;
+            switch (requestType) {
+                case "GETALL":
+                    document.getElementById("respuesta").innerHTML = doRequest(
+                        url + "personas",
+                        {},
+                        "GET"
+                    );
+                    break;
+                case "GET":
+                    let idPersonaGet = document.getElementById("id_persona").value;
+                    let respuesta = doRequest(
+                        url + "persona",
+                        { id: idPersonaGet },
+                        "GET"
+                    );
+                    document.getElementById("respuesta").innerHTML = respuesta;
+                    let objetoRespuesta = JSON.parse(respuesta);
+                    document.getElementById("nombre_persona").value = objetoRespuesta.data.nombre;
+                    document.getElementById("apellido_persona").value = objetoRespuesta.data.apellido;
+                    document.getElementById("altura_persona").value = objetoRespuesta.data.altura;
+                    document.getElementById("fecha_persona").value = objetoRespuesta.data.fecha_nacimiento;
+                    break;
+                case "DELETE":
+                    let idPersonaDelete = document.getElementById("id_persona").value;
+                    document.getElementById("respuesta").innerHTML = doRequest(
+                        url + "persona",
+                        { id: idPersonaDelete },
+                        "DELETE"
+                    );
+                    break;
+                case "POST":
+                    let personaCrear = {
+                        nombre: document.getElementById("nombre_persona").value,
+                        apellido: document.getElementById("apellido_persona").value,
+                        fecha_nacimiento: document.getElementById("fecha_persona").value,
+                        altura: document.getElementById("altura_persona").value
+                    }
+                    document.getElementById("respuesta").innerHTML = doRequest(
+                        url + "persona",
+                        personaCrear,
+                        "POST"
+                    );
+                    break;
+                case "PATCH":
+                    alert("No se implemento");
+                    break;
+                case "PUT":
+                    let personaActualizar = {
+                        id: document.getElementById("id_persona").value,
+                        nombre: document.getElementById("nombre_persona").value,
+                        apellido: document.getElementById("apellido_persona").value,
+                        fecha_nacimiento: document.getElementById("fecha_persona").value,
+                        altura: document.getElementById("altura_persona").value
+                    }
+                    document.getElementById("respuesta").innerHTML = doRequest(
+                        url + "persona",
+                        personaActualizar,
+                        "PUT"
+                    );
+                    break;
+            }
+
+        }
+        function doRequest(url, data, method) {
+            var response = $.ajax(
+                {
+                    type: method,
+                    url: url,
+                    data: data,
+                    cache: false,
+                    async: false
+                }
+            );
+            console.log(response);
+            return response.responseText;
+        }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</body>
+
+</html>
